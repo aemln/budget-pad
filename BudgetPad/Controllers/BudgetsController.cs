@@ -1,5 +1,6 @@
 ﻿using BudgetPad.Data;
 using BudgetPad.Models;
+using BudgetPad.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,63 +12,53 @@ namespace BudgetPad.Controllers
   [ApiController]
   public class BudgetsController : ControllerBase
   {
-    private readonly AppDbContext _context;
+    private readonly IBudgetRepository _repository;
 
-    public BudgetsController(AppDbContext context)
+    public BudgetsController(IBudgetRepository repository)
     {
-      _context = context;
+      _repository = repository;
     }
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<BudgetEntry>>> Get()
     {
-      return await _context.Budgets.ToListAsync();
+      var budgets = await _repository.GetAll();
+      return Ok(budgets);
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<BudgetEntry>> Get(int id)
     {
-      var budget = await _context.Budgets.FindAsync(id);
+      var budgets = await _repository.GetById(id);
 
-      if (budget == null) return NotFound();
-      return Ok(budget);
+      if (budgets == null) return NotFound();
+      return Ok(budgets);
     }
 
     [HttpPost]
     public async Task<ActionResult<BudgetEntry>> Post(BudgetEntry budget)
     {
-      budget.CreatedDate = DateTime.UtcNow;
-      _context.Budgets.Add(budget);
-      await _context.SaveChangesAsync();
-
+      var newBudget = await _repository.Add(budget); 
       return CreatedAtAction(
         nameof(Get),
-        new { id = budget.Id },
-        budget);
+        new { id = newBudget.Id },
+        newBudget);
     }
 
     [HttpPut("{id}")]
     public async Task<ActionResult<BudgetEntry>> Put(int id, BudgetEntry budget)
     {
-      var currentBudget = await _context.Budgets.FindAsync(id);
-      if (currentBudget == null) return NotFound();
       if (id != budget.Id) return BadRequest();
-
-      currentBudget.Category = budget.Category;
-      currentBudget.Amount = budget.Amount;
-      await _context.SaveChangesAsync();
-      return Ok(currentBudget);
+      var updatedBudget = await _repository.Update(id, budget);
+      if(updatedBudget == null) return NotFound();
+      return Ok(updatedBudget);
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-      var budget = await _context.Budgets.FindAsync(id);
+      var budget = await _repository.Delete(id);
       if (budget == null) return NotFound();
-
-      _context.Budgets.Remove(budget);
-      await _context.SaveChangesAsync();
-
       return Ok(budget);
     }
   }

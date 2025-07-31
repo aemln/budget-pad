@@ -1,4 +1,5 @@
 using BudgetPad.Data;
+using BudgetPad.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +17,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
   options.UseNpgsql(
     builder.Configuration.GetConnectionString("DefaultConnection")
  ));
+
+builder.Services.AddScoped<IBudgetRepository, BudgetRepository>();
 
 var app = builder.Build();
 
