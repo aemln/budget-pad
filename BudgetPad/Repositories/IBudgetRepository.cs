@@ -9,5 +9,6 @@ namespace BudgetPad.Repositories
     public Task<BudgetEntry> Add(BudgetEntry budget);
     public Task<BudgetEntry?> Update(int id, BudgetEntry budget);
     public Task<BudgetEntry?> Delete(int id);
+    public Task<List<BudgetEntry>> GetByUserId(int userId);
   }
 }

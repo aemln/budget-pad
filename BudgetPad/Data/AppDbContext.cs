@@ -9,5 +9,6 @@ namespace BudgetPad.Data
       :base(options) { }
 
     public DbSet<BudgetEntry> Budgets { get; set; }
+    public DbSet<User> Users { get; set; }
   }
 }

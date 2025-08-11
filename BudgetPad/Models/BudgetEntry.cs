@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BudgetPad.Models
 {
-  public class BudgetEntry
+    public class BudgetEntry
   {
     [Key]
     public int Id { get; set; }
@@ -15,5 +16,9 @@ namespace BudgetPad.Models
 
     [Required]
     public DateTime CreatedDate { get; set; }
+    public int UserId { get; set; }
+
+    [ForeignKey("UserId")]
+    public User User { get; set; } = null;
   }
 }

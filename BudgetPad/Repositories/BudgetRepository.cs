@@ -22,7 +22,6 @@ namespace BudgetPad.Repositories
     }
     public async Task<BudgetEntry> Add(BudgetEntry budget)
     {
-      budget.CreatedDate = DateTime.UtcNow;
       _context.Budgets.Add(budget);
       await _context.SaveChangesAsync();
       return budget;
@@ -46,6 +45,15 @@ namespace BudgetPad.Repositories
         await _context.SaveChangesAsync();
       }
       return budget;
+    }
+
+    public async Task<List<BudgetEntry>> GetByUserId(int userId)
+    {
+      var budgets = await _context.Budgets
+        .Where(b => b.UserId == userId)
+        .Include(b => b.User)
+        .ToListAsync();
+      return budgets;
     }
   }
 }
